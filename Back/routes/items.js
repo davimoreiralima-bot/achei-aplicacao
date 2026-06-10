@@ -21,8 +21,8 @@ const upload = multer({ storage: storage });
 // Configuração do transporte do Nodemailer para disparar e-mails
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com", 
-  port: 587,
-  secure: false, 
+  port: 465,
+  secure: true, 
   auth: {
     user: "davimoreiralima2005@gmail.com",       // coloque seu e-mail aqui
     pass: "mahxiakytzhisfzw"    // coloque sua senha de aplicativo aqui

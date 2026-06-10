@@ -88,7 +88,7 @@ export default function FeedView({ feedItems }) {
               <div className="w-full h-44 bg-[#f8fafc] flex items-center justify-center overflow-hidden border-b border-gray-100/60 shrink-0 relative">
                 {item.image_url ? (
                   <img 
-                    src={`http://localhost:3000${item.image_url}`} 
+                    src={`https://achei-aplicacao.onrender.com${item.image_url}`} 
                     alt={item.titulo} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
                   />
@@ -145,7 +145,7 @@ export default function FeedView({ feedItems }) {
             <div className="w-full h-64 bg-[#f8fafc] flex items-center justify-center overflow-hidden border-b shrink-0 relative">
               {selectedItem.image_url ? (
                 <img 
-                  src={`http://localhost:3000${selectedItem.image_url}`} 
+                  src={`https://achei-aplicacao.onrender.com${selectedItem.image_url}`} 
                   alt={selectedItem.titulo} 
                   className="w-full h-full object-cover" 
                 />

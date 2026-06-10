@@ -25,11 +25,11 @@ export default function App() {
     const loadData = async () => {
       try {
         if (activeTab === 'feed') {
-          const res = await fetch('http://localhost:3000/api/items/feed');
+          const res = await fetch('https://achei-aplicacao.onrender.com/api/items/feed');
           const data = await res.json();
           if (res.ok && isMounted) setFeedItems(data);
         } else if (activeTab === 'mine') {
-          const res = await fetch(`http://localhost:3000/api/items/mine/${user.matricula}`);
+          const res = await fetch(`https://achei-aplicacao.onrender.com/api/items/mine/${user.matricula}`);
           const data = await res.json();
           if (res.ok && isMounted) setMineItems(data);
         }

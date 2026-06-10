@@ -34,7 +34,7 @@ export default function MineView({ mineItems }) {
               <div className="w-20 h-20 rounded-xl bg-[#f8fafc] border border-gray-100 overflow-hidden shrink-0 mx-auto sm:mx-0 flex items-center justify-center relative shadow-inner">
                 {item.image_url ? (
                   <img 
-                    src={`http://localhost:3000${item.image_url}`} 
+                    src={`https://achei-aplicacao.onrender.com${item.image_url}`} 
                     alt="" 
                     className="w-full h-full object-cover" 
                   />

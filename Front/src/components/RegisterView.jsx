@@ -23,7 +23,7 @@ export default function RegisterView({ user, onItemRegistered }) {
       formData.append('cadastrado_por', user.matricula);
       if (imagem) formData.append('imagem', imagem);
 
-      const response = await fetch('http://localhost:3000/api/items/register', {
+      const response = await fetch('https://achei-aplicacao.onrender.com/api/items/register', {
         method: 'POST',
         body: formData
       });

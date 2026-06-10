@@ -14,7 +14,7 @@ export default function Login({ onLoginSuccess }) {
     
     setAuthLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/api/auth/login', {
+      const response = await fetch('https://achei-aplicacao.onrender.com/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ matricula, senha, tipo: role })

@@ -5,7 +5,10 @@ const pool = require('./db');
 const authRoutes = require('./routes/auth');
 const itemRoutes = require('./routes/items');
 require('dotenv').config();
-
+const fs = require('fs');
+if (!fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads');
+}
 const app = express();
 const PORT = process.env.PORT || 3000;
 

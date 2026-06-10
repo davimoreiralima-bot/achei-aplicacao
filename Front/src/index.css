@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy: #10345c;
+  --ink: #18324a;
+  --muted: #6d7f90;
+  --line: #dfe7ee;
+  --green: #137b4f;
+  --red: #bd3b3b;
+  --orange: #d98b20;
+}
+
+body {
+  margin: 0;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at top right, rgba(204,228,244,.78), transparent 30%), 
+              linear-gradient(180deg, #f8fbfd 0%, #f4f7fa 100%);
+  min-height: 100vh;
+}
+
+.soft-shadow { box-shadow: 0 18px 50px rgba(16,52,92,.10); }
+.card-shadow { box-shadow: 0 10px 28px rgba(16,52,92,.08); }
+
+.input-base {
+  width: 100%;
+  border: 1px solid #d7e1ea;
+  border-radius: 14px;
+  padding: .9rem 1rem;
+  outline: none;
+  transition: .2s ease;
+  background: white;
+  color: var(--ink);
+}
+
+.input-base:focus {
+  border-color: #2f6f9f;
+  box-shadow: 0 0 0 4px rgba(47,111,159,.12);
+}
+
+.fade-in { animation: fadeIn .28s ease both; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }

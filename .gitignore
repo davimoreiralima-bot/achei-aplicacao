@@ -1,0 +1,18 @@
+# Pastas de dependências (pesadas)
+node_modules/
+Back/node_modules/
+Front/node_modules/
+
+# Arquivos de configuração local e senhas
+.env
+Back/.env
+.DS_Store
+
+# Pastas de compilação do React
+dist/
+Front/dist/
+dist-ssr/
+
+# Fotos de teste locais (bloqueia o upload de imagens gigantes para o GitHub)
+Back/uploads/*
+!Back/uploads/.gitkeep

@@ -18,19 +18,19 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Configuração do transporte do Nodemailer para disparar e-mails
+// Configuração do transporte do Nodemailer para disparar e-mails (Porta 465 Segura)
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com", 
   port: 465,
   secure: true, 
   auth: {
-    user: "davimoreiralima2005@gmail.com",       // coloque seu e-mail aqui
-    pass: "mahxiakytzhisfzw"    // coloque sua senha de aplicativo aqui
+    user: "davimoreiralima2005@gmail.com",       
+    pass: "mahxiakytzhisfzw"    
   }
 });
 
 // =========================================================================
-// ROTA: Cadastrar um item encontrado (Com foto física via FormData)
+// ROTA: Cadastrar um item encontrado + Notificação por E-mail Automática
 // =========================================================================
 router.post('/register', upload.single('imagem'), async (req, res) => {
   const { titulo, categoria, descricao, local, cadastrado_por } = req.body;
@@ -44,6 +44,7 @@ router.post('/register', upload.single('imagem'), async (req, res) => {
   const image_url = req.file ? `/uploads/${req.file.filename}` : null;
 
   try {
+    // 1. Salva o item na tabela principal com o status pendente 'Aguardando Balcão'
     const queryText = `
       INSERT INTO itens (id_numerico, titulo, categoria, descricao, local, status, token_entrada, cadastrado_por, image_url)
       VALUES ($1, $2, $3, $4, $5, 'Aguardando Balcão', $6, $7, $8)
@@ -54,10 +55,46 @@ router.post('/register', upload.single('imagem'), async (req, res) => {
       id_numerico, titulo, categoria, descricao, local, token_entrada, cadastrado_por, image_url
     ]);
 
+    // 2. Registra a ação no histórico de auditoria
     await pool.query(
       'INSERT INTO logs_sistema (acao, item_id, funcionario_matricula) VALUES ($1, $2, $3)',
       ['Cadastro de item', resultado.rows[0].id, cadastrado_por]
     );
+
+    // 3. PROCESSO 4: SISTEMA DE NOTIFICAÇÕES AUTOMÁTICAS
+    const categoriaColuna = categoria.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const colunasValidas = ['eletronicos', 'documentos', 'livros', 'vestuario', 'outros'];
+
+    if (colunasValidas.includes(categoriaColuna)) {
+      const buscaInteressados = await pool.query(
+        `SELECT email_notificacao FROM preferencias_notificacoes 
+         WHERE ${categoriaColuna} = true AND email_notificacao IS NOT NULL AND email_notificacao != '';`
+      );
+
+      buscaInteressados.rows.forEach(row => {
+        const mailOptionsNotif = {
+          from: '"ACHEI! Notificações" <davimoreiralima2005@gmail.com>',
+          to: row.email_notificacao,
+          subject: `🔔 Objeto de Interesse Encontrado: ${titulo}`,
+          html: `
+            <div style="font-family: sans-serif; max-width: 500px; padding: 20px; border: 1px solid #e2eaf0; border-radius: 12px;">
+              <h2 style="color: #10345c;">🔔 Alerta de Preferências!</h2>
+              <p>Olá! Um novo objeto correspondente às suas categorias de interesse foi cadastrado no sistema:</p>
+              <div style="background-color: #f5f8fb; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <strong style="font-size: 18px; color: #10345c;">${titulo}</strong><br/>
+                <span style="font-size: 13px; color: #6d7f90;">Categoria: ${categoria} | Local: ${local}</span>
+              </div>
+              <p style="font-size: 13px; color: #6d7f90;">Acesse o Mural do aplicativo para conferir a listagem completa.</p>
+            </div>
+          `
+        };
+
+        transporter.sendMail(mailOptionsNotif, (err, info) => {
+          if (err) console.error('Erro ao enviar e-mail de notificação:', err.message);
+          else console.log('Notificação enviada com sucesso para:', row.email_notificacao);
+        });
+      });
+    }
 
     res.status(201).json({
       message: 'Item pré-registrado com sucesso!',
@@ -134,7 +171,7 @@ router.get('/token/:token', async (req, res) => {
 });
 
 // =========================================================================
-// ROTA COM VALIDAÇÃO: Confirmação Física de Entrada (Bloqueia Auto-recebimento)
+// ROTA COM VALIDAÇÃO: Confirmação Física de Entrada (Libera para o Mural Público)
 // =========================================================================
 router.post('/confirm-entry', async (req, res) => {
   const { item_id, funcionario_matricula } = req.body;
@@ -144,21 +181,18 @@ router.post('/confirm-entry', async (req, res) => {
   }
 
   try {
-    // 1. FAZ A CHECAGEM COMPLEMENTAR: Descobre a matrícula de quem achou/cadastrou o objeto
     const itemCheck = await pool.query("SELECT cadastrado_por FROM itens WHERE id = $1;", [item_id]);
 
     if (itemCheck.rows.length === 0) {
       return res.status(404).json({ error: 'Objeto não localizado no banco de dados.' });
     }
 
-    // 2. BLOQUEIO ADICIONADO: Se quem cadastrou for igual a quem valida -> RECUSADO!
     if (itemCheck.rows[0].cadastrado_por === funcionario_matricula) {
       return res.status(400).json({ 
         error: 'Operação Recusada! Por motivos de auditoria, o operador que localizou/cadastrou o item não pode validar a sua própria entrada no estoque.' 
       });
     }
 
-    // 3. SE PASSAR PELA BARREIRA, EXECUTA O UPDATE ORIGINAL
     const queryText = `
       UPDATE itens
       SET status = 'No Estoque'
@@ -211,10 +245,9 @@ router.post('/initiate-return', async (req, res) => {
     }
 
     const mailOptions = {
-      from: '"ACHEI! Achados e Perdidos" <seu-email-real@gmail.com>',
+      from: '"ACHEI! Achados e Perdidos" <davimoreiralima2005@gmail.com>',
       to: requerente_email, 
       subject: `Código de Resgate - ${resultado.rows[0].titulo}`,
-      text: `Olá, ${requerente_nome}! Foi iniciado o processo de devolução do objeto: ${resultado.rows[0].titulo}. Seu código de resgate é: ${token_saida}.`,
       html: `
         <div style="font-family: sans-serif; max-width: 500px; padding: 20px; border: 1px solid #e2eaf0; border-radius: 12px;">
           <h2 style="color: #10345c;">Olá, ${requerente_nome}!</h2>

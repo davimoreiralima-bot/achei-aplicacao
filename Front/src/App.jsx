@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { LogOut, Search, PlusCircle, ClipboardList, LayoutDashboard, SearchCheck, PackageCheck } from 'lucide-react';
+import { LogOut, Search, PlusCircle, ClipboardList, LayoutDashboard, SearchCheck, PackageCheck, Bell } from 'lucide-react';
+import { API_BASE_URL } from './config'; // <-- IMPORTA A CHAVE SELETORA INTELIGENTE
 
 // Importação dos componentes modulares protegidos
 import Login from './components/Login';
@@ -7,6 +8,7 @@ import FeedView from './components/FeedView';
 import RegisterView from './components/RegisterView';
 import MineView from './components/MineView';
 import ManagementView from './components/ManagementView';
+import NotificationView from './components/NotificationView'; 
 
 export default function App() {
   const [user, setUser] = useState(null);   
@@ -17,7 +19,7 @@ export default function App() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [generatedToken, setGeneratedToken] = useState('000000');
 
-  // Sincronização centralizada com o banco PostgreSQL
+  // Sincronização centralizada com o banco PostgreSQL (USANDO URL DINÂMICA)
   useEffect(() => {
     if (!user) return;
     let isMounted = true;
@@ -25,11 +27,11 @@ export default function App() {
     const loadData = async () => {
       try {
         if (activeTab === 'feed') {
-          const res = await fetch('https://achei-aplicacao.onrender.com/api/items/feed');
+          const res = await fetch(`${API_BASE_URL}/api/items/feed`); // <-- AJUSTADO
           const data = await res.json();
           if (res.ok && isMounted) setFeedItems(data);
         } else if (activeTab === 'mine') {
-          const res = await fetch(`https://achei-aplicacao.onrender.com/api/items/mine/${user.matricula}`);
+          const res = await fetch(`${API_BASE_URL}/api/items/mine/${user.matricula}`); // <-- AJUSTADO
           const data = await res.json();
           if (res.ok && isMounted) setMineItems(data);
         }
@@ -48,7 +50,6 @@ export default function App() {
   }
 
   return (
-    // pb-32 garante espaço de segurança absoluto para que nenhum card fique preso atrás do menu inferior
     <div className="w-full min-h-screen bg-[#f4f7fa] pb-32 md:pb-24 box-border">
       
       {/* HEADER COMPARTILHADO */}
@@ -82,6 +83,7 @@ export default function App() {
           />
         )}
         {activeTab === 'mine' && <MineView mineItems={mineItems} />}
+        {activeTab === 'notifications' && <NotificationView user={user} />} 
         {activeTab === 'management' && user.tipo === 'funcionario' && <ManagementView user={user} />}
       </main>
 
@@ -101,9 +103,9 @@ export default function App() {
         </div>
       )}
 
-      {/* BARRA DE NAVEGAÇÃO COMPACTA INFERIOR (Z-INDEX IMPEDINDO SOBREPOSIÇÃO) */}
+      {/* BARRA DE NAVEGAÇÃO COMPACTA INFERIOR */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#dce6ed] shadow-[0_-8px_30px_rgba(15,42,70,0.06)] md:max-w-xl md:mx-auto md:mb-5 md:rounded-2xl md:border box-border">
-        <div className={`grid w-full p-2 gap-1.5 ${user.tipo === 'funcionario' ? 'grid-cols-4' : 'grid-cols-3'}`}>
+        <div className={`grid w-full p-2 gap-1.5 ${user.tipo === 'funcionario' ? 'grid-cols-5' : 'grid-cols-4'}`}>
           <button onClick={() => setActiveTab('feed')} className={`px-2 py-2 flex flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-bold transition-all cursor-pointer ${activeTab === 'feed' ? 'bg-[#e8f1f8] text-[#10345c]' : 'text-[#6d7f90] hover:bg-slate-50'}`}>
             <Search className="w-5 h-5" /> <span>Mural</span>
           </button>
@@ -112,6 +114,9 @@ export default function App() {
           </button>
           <button onClick={() => setActiveTab('mine')} className={`px-2 py-2 flex flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-bold transition-all cursor-pointer ${activeTab === 'mine' ? 'bg-[#e8f1f8] text-[#10345c]' : 'text-[#6d7f90] hover:bg-slate-50'}`}>
             <ClipboardList className="w-5 h-5" /> <span>Meus Itens</span>
+          </button>
+          <button onClick={() => setActiveTab('notifications')} className={`px-2 py-2 flex flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-bold transition-all cursor-pointer ${activeTab === 'notifications' ? 'bg-[#e8f1f8] text-[#10345c]' : 'text-[#6d7f90] hover:bg-slate-50'}`}>
+            <Bell className="w-5 h-5" /> <span>Notificações</span>
           </button>
           {user.tipo === 'funcionario' && (
             <button onClick={() => setActiveTab('management')} className={`px-2 py-2 flex flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-bold transition-all cursor-pointer ${activeTab === 'management' ? 'bg-[#e8f1f8] text-[#10345c]' : 'text-[#6d7f90] hover:bg-slate-50'}`}>

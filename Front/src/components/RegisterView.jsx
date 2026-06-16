@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Send } from 'lucide-react';
+import { API_BASE_URL } from '../config'; // <-- Importação dinâmica da URL da API
 
 export default function RegisterView({ user, onItemRegistered }) {
   const [titulo, setTitulo] = useState('');
@@ -23,7 +24,7 @@ export default function RegisterView({ user, onItemRegistered }) {
       formData.append('cadastrado_por', user.matricula);
       if (imagem) formData.append('imagem', imagem);
 
-      const response = await fetch('https://achei-aplicacao.onrender.com/api/items/register', {
+      const response = await fetch(`${API_BASE_URL}/api/items/register`, {
         method: 'POST',
         body: formData
       });

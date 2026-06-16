@@ -1,4 +1,5 @@
 import { Archive, ClipboardList, CheckCircle2, Clock } from 'lucide-react';
+import { API_BASE_URL } from '../config'; // <-- IMPORTAÇÃO DINÂMICA DA API
 
 export default function MineView({ mineItems }) {
   return (
@@ -34,7 +35,7 @@ export default function MineView({ mineItems }) {
               <div className="w-20 h-20 rounded-xl bg-[#f8fafc] border border-gray-100 overflow-hidden shrink-0 mx-auto sm:mx-0 flex items-center justify-center relative shadow-inner">
                 {item.image_url ? (
                   <img 
-                    src={`https://achei-aplicacao.onrender.com${item.image_url}`} 
+                    src={`${API_BASE_URL}${item.image_url}`} // <-- URL DINÂMICA AJUSTADA HERE
                     alt="" 
                     className="w-full h-full object-cover" 
                   />
@@ -72,7 +73,7 @@ export default function MineView({ mineItems }) {
                 <div className="rounded-xl bg-[#f5f8fb] border border-[#e0e8ee] px-4 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-left">
                   <div>
                     <p className="text-[10px] text-[#6d7f90] uppercase font-extrabold tracking-wider">
-                      Token de Autenticação para Entrega
+                      Token de Autenticação para Delivery
                     </p>
                     <p className="font-mono font-extrabold tracking-[0.15em] text-[#10345c] text-lg mt-0.5">
                       {item.token_entrada}

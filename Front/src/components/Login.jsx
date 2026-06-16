@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { SearchCheck, GraduationCap, BadgeCheck } from 'lucide-react';
+import { API_BASE_URL } from '../config'; // <-- IMPORTAÇÃO DINÂMICA DA API
 
 export default function Login({ onLoginSuccess }) {
   const [step, setStep] = useState('role'); 
@@ -14,7 +15,7 @@ export default function Login({ onLoginSuccess }) {
     
     setAuthLoading(true);
     try {
-      const response = await fetch('https://achei-aplicacao.onrender.com/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, { // <-- URL DINÂMICA AJUSTADA HERE
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ matricula, senha, tipo: role })
@@ -28,7 +29,7 @@ export default function Login({ onLoginSuccess }) {
       }
 
       alert(data.message);
-      onLoginSuccess(data.user); // Avisa o App.jsx que o usuário logou
+      onLoginSuccess(data.user); 
     } catch (error) {
       console.error(error);
       alert('Não foi possível conectar ao servidor back-end.');

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Search, PackageCheck, Archive, X, MapPin, Calendar, Tag } from 'lucide-react';
+import { API_BASE_URL } from '../config'; // <-- IMPORTAÇÃO DINÂMICA DA API
 
 export default function FeedView({ feedItems }) {
   const [activeCategory, setActiveCategory] = useState('Todos');
@@ -45,7 +46,7 @@ export default function FeedView({ feedItems }) {
           <input 
             type="text" 
             className="input-base pl-12 bg-[#f8fafc] border-gray-200/80 focus:bg-white text-sm" 
-            placeholder="Buscar por nome, bloco, características..." 
+            placeholder="Buscar por nome, bloco, characteristics..." 
             value={searchTerm} 
             onChange={(e) => setSearchTerm(e.target.value)} 
           />
@@ -84,11 +85,11 @@ export default function FeedView({ feedItems }) {
               type="button"
               className="overflow-hidden rounded-[22px] bg-white border border-[#e1e9ef] card-shadow text-left transition-all duration-200 hover:-translate-y-1 hover:shadow-md flex flex-col group cursor-pointer"
             >
-              {/* Contêiner de Imagem com Tamanho Rígido Proporcional */}
+              {/* Contêiner de Imagem com URL Dinâmica */}
               <div className="w-full h-44 bg-[#f8fafc] flex items-center justify-center overflow-hidden border-b border-gray-100/60 shrink-0 relative">
                 {item.image_url ? (
                   <img 
-                    src={`https://achei-aplicacao.onrender.com${item.image_url}`} 
+                    src={`${API_BASE_URL}${item.image_url}`} // <-- URL DINÂMICA AJUSTADA HERE
                     alt={item.titulo} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
                   />
@@ -126,9 +127,7 @@ export default function FeedView({ feedItems }) {
         </div>
       )}
 
-      {/* =========================================================================
-          MODAL INTERATIVO DE DETALHES COMPLETOS DO OBJETO
-          ========================================================================= */}
+      {/* MODAL INTERATIVO DE DETALHES COMPLETOS DO OBJETO */}
       {selectedItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
           <div className="bg-white rounded-[28px] w-full max-w-lg overflow-hidden shadow-2xl border border-white flex flex-col max-h-[90vh] text-left relative animate-scale-up">
@@ -145,7 +144,7 @@ export default function FeedView({ feedItems }) {
             <div className="w-full h-64 bg-[#f8fafc] flex items-center justify-center overflow-hidden border-b shrink-0 relative">
               {selectedItem.image_url ? (
                 <img 
-                  src={`https://achei-aplicacao.onrender.com${selectedItem.image_url}`} 
+                  src={`${API_BASE_URL}${selectedItem.image_url}`} // <-- URL DINÂMICA AJUSTADA HERE
                   alt={selectedItem.titulo} 
                   className="w-full h-full object-cover" 
                 />

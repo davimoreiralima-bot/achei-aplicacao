@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ScanLine, Search, AlertCircle, CheckCircle2, ArrowRight, UserCheck, Gift, ClipboardList } from 'lucide-react';
+import { API_BASE_URL } from '../config'; // <-- IMPORTAÇÃO DINÂMICA DA URL DA API
 
 export default function ManagementView({ user }) {
   // =========================================================================
@@ -60,7 +61,7 @@ export default function ManagementView({ user }) {
     let isMounted = true;
     const loadStockItems = async () => {
       try {
-        const response = await fetch('https://achei-aplicacao.onrender.com/api/items/feed');
+        const response = await fetch(`${API_BASE_URL}/api/items/feed`); // <-- AJUSTADO
         const data = await response.json();
         if (response.ok && isMounted) {
           setStockItems(data);
@@ -83,7 +84,7 @@ export default function ManagementView({ user }) {
     let isMounted = true;
     const loadLogs = async () => {
       try {
-        const response = await fetch('https://achei-aplicacao.onrender.com/api/items/logs');
+        const response = await fetch(`${API_BASE_URL}/api/items/logs`); // <-- AJUSTADO
         const data = await response.json();
         if (response.ok && isMounted) {
           setSystemLogs(data);
@@ -109,7 +110,7 @@ export default function ManagementView({ user }) {
     setLoading(true);
     setFoundItem(null);
     try {
-      const response = await fetch(`https://achei-aplicacao.onrender.com/api/items/token/${tokenInput}`);
+      const response = await fetch(`${API_BASE_URL}/api/items/token/${tokenInput}`); // <-- AJUSTADO
       const data = await response.json();
       if (!response.ok) { alert(data.error || 'Erro ao buscar o token.'); return; }
       setFoundItem(data);
@@ -123,7 +124,7 @@ export default function ManagementView({ user }) {
     if (!foundItem) return;
     setLoading(true);
     try {
-      const response = await fetch('https://achei-aplicacao.onrender.com/api/items/confirm-entry', {
+      const response = await fetch(`${API_BASE_URL}/api/items/confirm-entry`, { // <-- AJUSTADO
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ item_id: foundItem.id, funcionario_matricula: user.matricula })
@@ -144,7 +145,7 @@ export default function ManagementView({ user }) {
 
     setLoading(true);
     try {
-      const response = await fetch('https://achei-aplicacao.onrender.com/api/items/initiate-return', {
+      const response = await fetch(`${API_BASE_URL}/api/items/initiate-return`, { // <-- AJUSTADO
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -173,7 +174,7 @@ export default function ManagementView({ user }) {
     setLoading(true);
     setDeliveryItem(null);
     try {
-      const response = await fetch(`https://achei-aplicacao.onrender.com/api/items/token-exit/${tokenExitInput}`);
+      const response = await fetch(`${API_BASE_URL}/api/items/token-exit/${tokenExitInput}`); // <-- AJUSTADO
       const data = await response.json();
       if (!response.ok) { alert(data.error || 'Token de saída não localizado.'); return; }
       setDeliveryItem(data);
@@ -184,7 +185,7 @@ export default function ManagementView({ user }) {
     if (!deliveryItem) return;
     setLoading(true);
     try {
-      const response = await fetch('https://achei-aplicacao.onrender.com/api/items/confirm-delivery', {
+      const response = await fetch(`${API_BASE_URL}/api/items/confirm-delivery`, { // <-- AJUSTADO
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ item_id: deliveryItem.id, funcionario_matricula: user.matricula })
@@ -290,7 +291,7 @@ export default function ManagementView({ user }) {
               <div className="space-y-3 max-h-[450px] overflow-y-auto pr-1">
                 {stockItems.map((item) => (
                   <button key={item.id} onClick={() => { setSelectedItem(item); setIsSentSuccess(false); }} className={`w-full text-left p-3.5 rounded-xl border transition flex items-center gap-3 ${selectedItem?.id === item.id ? 'border-[#10345c] bg-[#f5f8fb]' : 'border-gray-100 hover:bg-slate-50'}`}>
-                    {item.image_url ? <img src={`https://achei-aplicacao.onrender.com${item.image_url}`} alt="" className="w-12 h-12 rounded-lg object-cover shrink-0" /> : <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">📦</div>}
+                    {item.image_url ? <img src={`${API_BASE_URL}${item.image_url}`} alt="" className="w-12 h-12 rounded-lg object-cover shrink-0" /> : <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">📦</div>} {/* <-- AJUSTADO URL IMAGEM */}
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-[#18324a] truncate text-sm">{item.titulo}</p>
                       <p className="text-xs text-gray-400 truncate mt-0.5">{item.categoria} • {item.local}</p>
